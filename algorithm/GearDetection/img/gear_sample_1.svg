@@ -1,0 +1,66 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="600" fill="#f8f9fa"/>
+  
+  <!-- 齿轮外圈 -->
+  <circle cx="400" cy="300" r="200" fill="#e2e8f0" stroke="#94a3b8" stroke-width="4"/>
+  
+  <!-- 齿轮内圈 -->
+  <circle cx="400" cy="300" r="80" fill="#f8fafc" stroke="#94a3b8" stroke-width="3"/>
+  
+  <!-- 齿轮齿 -->
+  <g stroke="#94a3b8" stroke-width="3" fill="#e2e8f0">
+    <!-- 24个齿 -->
+    <path d="M400,100 L420,50 L380,50 Z" />
+    <path d="M483,117 L520,80 L490,60 Z" />
+    <path d="M550,183 L600,160 L590,120 Z" />
+    <path d="M583,300 L640,300 L640,260 Z" />
+    <path d="M550,417 L600,440 L590,480 Z" />
+    <path d="M483,483 L520,520 L490,540 Z" />
+    <path d="M400,500 L420,550 L380,550 Z" />
+    <path d="M317,483 L280,520 L310,540 Z" />
+    <path d="M250,417 L200,440 L210,480 Z" />
+    <path d="M217,300 L160,300 L160,260 Z" />
+    <path d="M250,183 L200,160 L210,120 Z" />
+    <path d="M317,117 L280,80 L310,60 Z" />
+  </g>
+  
+  <!-- 齿轮中心孔 -->
+  <circle cx="400" cy="300" r="40" fill="#f8fafc" stroke="#94a3b8" stroke-width="3"/>
+  
+  <!-- 缺陷：点蚀 (红色) -->
+  <g fill="#FF3B30" opacity="0.8">
+    <circle cx="150" cy="120" r="5" />
+    <circle cx="155" cy="125" r="4" />
+    <circle cx="145" cy="118" r="3" />
+    <circle cx="152" cy="115" r="4" />
+    <circle cx="148" cy="128" r="3" />
+    
+    <circle cx="320" cy="220" r="4" />
+    <circle cx="325" cy="225" r="5" />
+    <circle cx="318" cy="218" r="3" />
+    <circle cx="322" cy="215" r="4" />
+    <circle cx="315" cy="222" r="3" />
+  </g>
+  
+  <!-- 缺陷：压伤 (绿色) -->
+  <path d="M400,180 Q420,170 440,180 Q450,200 440,220 Q420,230 400,220 Q390,200 400,180 Z" 
+        fill="#4CD964" opacity="0.7" stroke="#4CD964" stroke-width="2" />
+  
+  <!-- 缺陷边界框 -->
+  <rect x="150" y="120" width="60" height="40" fill="none" stroke="#FF3B30" stroke-width="2" stroke-dasharray="5,5" />
+  <rect x="320" y="220" width="45" height="35" fill="none" stroke="#FF3B30" stroke-width="2" stroke-dasharray="5,5" />
+  <rect x="400" y="180" width="70" height="50" fill="none" stroke="#4CD964" stroke-width="2" stroke-dasharray="5,5" />
+  
+  <!-- 缺陷标签 -->
+  <g font-family="Arial" font-size="12" font-weight="bold">
+    <rect x="150" y="105" width="60" height="15" fill="#FF3B30" />
+    <text x="155" y="117" fill="white">点蚀 92%</text>
+    
+    <rect x="320" y="205" width="60" height="15" fill="#FF3B30" />
+    <text x="325" y="217" fill="white">点蚀 85%</text>
+    
+    <rect x="400" y="165" width="70" height="15" fill="#4CD964" />
+    <text x="405" y="177" fill="white">压伤 78%</text>
+  </g>
+</svg>

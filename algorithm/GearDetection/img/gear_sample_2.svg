@@ -1,0 +1,59 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="600" fill="#f8f9fa"/>
+  
+  <!-- 齿轮外圈 -->
+  <circle cx="400" cy="300" r="200" fill="#d1d5db" stroke="#6b7280" stroke-width="4"/>
+  
+  <!-- 齿轮内圈 -->
+  <circle cx="400" cy="300" r="80" fill="#f3f4f6" stroke="#6b7280" stroke-width="3"/>
+  
+  <!-- 齿轮齿 -->
+  <g stroke="#6b7280" stroke-width="3" fill="#d1d5db">
+    <!-- 16个齿 -->
+    <path d="M400,100 L430,40 L370,40 Z" />
+    <path d="M500,150 L560,100 L530,70 Z" />
+    <path d="M550,300 L620,300 L620,250 Z" />
+    <path d="M500,450 L560,500 L530,530 Z" />
+    <path d="M400,500 L430,560 L370,560 Z" />
+    <path d="M300,450 L240,500 L270,530 Z" />
+    <path d="M250,300 L180,300 L180,250 Z" />
+    <path d="M300,150 L240,100 L270,70 Z" />
+  </g>
+  
+  <!-- 齿轮中心孔 -->
+  <circle cx="400" cy="300" r="40" fill="#f3f4f6" stroke="#6b7280" stroke-width="3"/>
+  
+  <!-- 缺陷：剥落 (橙色) -->
+  <path d="M200,150 Q220,140 240,150 Q250,170 240,190 Q220,200 200,190 Q190,170 200,150 Z" 
+        fill="#FF9500" opacity="0.8" stroke="#FF9500" stroke-width="2" />
+  <path d="M210,160 L230,170 L225,180 L205,175 Z" fill="#f3f4f6" />
+  <path d="M215,175 L235,185 L230,195 L210,190 Z" fill="#f3f4f6" />
+  
+  <!-- 缺陷：擦伤 (蓝色) -->
+  <g stroke="#007AFF" stroke-width="3" stroke-linecap="round">
+    <line x1="350" y1="200" x2="470" y2="200" />
+    <line x1="355" y1="210" x2="465" y2="210" />
+    <line x1="360" y1="220" x2="460" y2="220" />
+    <line x1="365" y1="230" x2="455" y2="230" />
+  </g>
+  
+  <!-- 缺陷边界框 -->
+  <rect x="200" y="150" width="80" height="60" fill="none" stroke="#FF9500" stroke-width="2" stroke-dasharray="5,5" />
+  <rect x="350" y="200" width="120" height="30" fill="none" stroke="#007AFF" stroke-width="2" stroke-dasharray="5,5" />
+  
+  <!-- 缺陷标签 -->
+  <g font-family="Arial" font-size="12" font-weight="bold">
+    <rect x="200" y="135" width="70" height="15" fill="#FF9500" />
+    <text x="205" y="147" fill="white">剥落 88%</text>
+    
+    <rect x="350" y="185" width="70" height="15" fill="#007AFF" />
+    <text x="355" y="197" fill="white">擦伤 76%</text>
+  </g>
+  
+  <!-- 添加一些细节 -->
+  <g fill="#9ca3af" opacity="0.3">
+    <circle cx="400" cy="300" r="150" fill="none" stroke="#9ca3af" stroke-width="1" stroke-dasharray="2,4" />
+    <circle cx="400" cy="300" r="120" fill="none" stroke="#9ca3af" stroke-width="1" stroke-dasharray="2,4" />
+  </g>
+</svg>

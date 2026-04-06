@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>齿轮缺陷检测平台</title>
+    <style>
+        /* 全局样式和变量 */
+        :root {
+            --primary-blue: #3B82F6;
+            --light-blue: #E0F2FE;
+            --dark-blue: #1E3A8A;
+            --purple: #8B5CF6;
+            --light-purple: #E9D5FF;
+            --white: #FFFFFF;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #E0F2FE 0%, #F3E8FF 100%);
+            min-height: 100vh;
+            color: var(--gray-700);
+            overflow-x: hidden;
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* 顶部栏 */
+        .header {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--purple));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .logo-text h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-blue), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--light-blue);
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--primary-blue);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            min-height: 0;
+        }
+
+        /* 左侧控制面板 */
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .control-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .control-panel::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: 3px;
+        }
+
+        .control-panel::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 3px;
+        }
+
+        /* 卡片样式 */
+        .card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--light-blue);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-blue);
+            font-size: 18px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        /* 上传区域 */
+        .upload-zone {
+            border: 2px dashed var(--gray-300);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--gray-50);
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+
+        .upload-zone.drag-over {
+            border-color: var(--primary-blue);
+            background: var(--light-blue);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-bottom: 4px;
+        }
+
+        .upload-hint {
+            font-size: 12px;
+            color: var(--gray-400);
+        }
+
+        /* 参数滑块 */
+        .slider-container {
+            margin-top: 12px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .slider-value {
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--gray-200);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.1);
+        }
+
+        /* 按钮 */
+        .btn {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--purple));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+        }
+
+        .btn:disabled {
+            background: var(--gray-200);
+            color: var(--gray-400);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 图像显示区 */
+        .image-area {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 0;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            height: 100%;
+        }
+
+        .image-display {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--gray-400);
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-500);
+            margin-bottom: 8px;
+        }
+
+        .empty-subtitle {
+            font-size: 14px;
+            color: var(--gray-400);
+        }
+
+        .image-display img,
+        .result-canvas {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+
+        /* 弹窗基础样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gray-700);
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: var(--gray-100);
+            color: var(--gray-500);
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* 检测结果卡片 */
+        .result-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            background: var(--gray-50);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid var(--gray-200);
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 4px;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* 缺陷列表 */
+        .defect-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .defect-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: var(--gray-50);
+            border-radius: 12px;
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .defect-item:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow);
+        }
+
+        .defect-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            margin-right: 16px;
+        }
+
+        .defect-info {
+            flex: 1;
+        }
+
+        .defect-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .defect-details {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        .defect-confidence {
+            text-align: right;
+        }
+
+        .confidence-value {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .confidence-badge {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* 加载状态 */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            border-radius: 16px;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--gray-200);
+            border-top: 4px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--gray-600);
+            font-size: 14px;
+        }
+
+        /* 通知 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 20px;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            max-width: 320px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .notification.success .notification-icon {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+        }
+
+        .notification.error .notification-icon {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        .notification-message {
+            flex: 1;
+            font-size: 14px;
+            color: var(--gray-700);
+        }
+
+        /* 文件信息 */
+        .file-info {
+            margin-top: 12px;
+            padding: 12px;
+            background: var(--gray-50);
+            border-radius: 8px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-icon {
+            color: var(--primary-blue);
+        }
+
+        .file-name {
+            flex: 1;
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-size {
+            color: var(--gray-500);
+            font-size: 12px;
+        }
+
+        /* 缺陷说明 */
+        .defect-types {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .defect-type-card {
+            padding: 16px;
+            border-radius: 12px;
+            border-left: 4px solid;
+            background: var(--gray-50);
+        }
+
+        .defect-type-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .defect-type-desc {
+            font-size: 13px;
+            color: var(--gray-600);
+            line-height: 1.5;
+        }
+
+        /* 快速统计 */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--light-blue);
+            border-radius: 12px;
+        }
+
+        .quick-stat {
+            text-align: center;
+        }
+
+        .quick-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .quick-stat-label {
+            font-size: 12px;
+            color: var(--gray-600);
+        }
+
+        /* 响应式 */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .control-panel {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 16px;
+                height: auto;
+            }
+
+            .result-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+                gap: 12px;
+            }
+
+            .header {
+                padding: 16px;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .logo-text h1 {
+                font-size: 20px;
+            }
+
+            .defect-types {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部栏 -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">⚙️</div>
+                <div class="logo-text">
+                    <h1>齿轮缺陷检测平台</h1>
+                    <p>基于YOLO深度学习的智能检测系统</p>
+                </div>
+            </div>
+            <div id="api-status" class="status-badge">
+                <div class="status-dot"></div>
+                <span>系统就绪</span>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 左侧控制面板 -->
+            <div class="control-panel">
+                <!-- 图像上传卡片 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📸</div>
+                        <h3 class="card-title">图像上传</h3>
+                    </div>
+                    <div id="upload-zone" class="upload-zone">
+                        <div class="upload-icon">📷</div>
+                        <p class="upload-text">点击或拖拽上传图像</p>
+                        <p class="upload-hint">支持 JPG、PNG 格式，最大 16MB</p>
+                    </div>
+                    <input type="file" id="file-input" accept="image/*" style="display: none;">
+                    <div id="file-info" class="file-info hidden">
+                        <span class="file-icon">📄</span>
+                        <span id="file-name" class="file-name"></span>
+                        <span id="file-size" class="file-size"></span>
+                    </div>
+                </div>
+
+                <!-- 检测参数卡片 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">⚡</div>
+                        <h3 class="card-title">检测参数</h3>
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>置信度阈值</span>
+                            <span id="confidence-value" class="slider-value">0.25</span>
+                        </div>
+                        <input type="range" id="confidence-slider" class="slider" min="0.1" max="0.9" step="0.05" value="0.25">
+                    </div>
+                    <div class="quick-stats">
+                        <div class="quick-stat">
+                            <div class="quick-stat-value">97.6%</div>
+                            <div class="quick-stat-label">mAP50</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="quick-stat-value">70.2%</div>
+                            <div class="quick-stat-label">mAP50-95</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 操作按钮卡片 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🎯</div>
+                        <h3 class="card-title">操作控制</h3>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <button id="detect-btn" class="btn btn-primary" disabled>
+                            <span>🔍</span>
+                            <span>开始检测</span>
+                        </button>
+                        <button id="results-btn" class="btn btn-secondary hidden">
+                            <span>📊</span>
+                            <span>查看报告</span>
+                        </button>
+                        <button id="reset-btn" class="btn btn-secondary">
+                            <span>🔄</span>
+                            <span>重新开始</span>
+                        </button>
+                        <button id="info-btn" class="btn btn-secondary">
+                            <span>ℹ️</span>
+                            <span>缺陷说明</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧图像显示区 -->
+            <div class="image-area">
+                <div id="image-display" class="image-display">
+                    <div class="empty-state">
+                        <div class="empty-icon">🖼️</div>
+                        <div class="empty-title">请上传齿轮图像</div>
+                        <div class="empty-subtitle">支持拖拽上传，系统将自动检测缺陷</div>
+                    </div>
+                </div>
+                <canvas id="result-canvas" class="result-canvas hidden"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 检测结果弹窗 -->
+    <div id="results-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">检测报告</h3>
+                <button class="modal-close" onclick="closeResultsModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="result-summary">
+                    <div class="summary-card">
+                        <div id="total-defects" class="summary-value">0</div>
+                        <div class="summary-label">总缺陷数</div>
+                    </div>
+                    <div class="summary-card">
+                        <div id="avg-confidence" class="summary-value">0%</div>
+                        <div class="summary-label">平均置信度</div>
+                    </div>
+                    <div class="summary-card">
+                        <div id="high-confidence" class="summary-value">0</div>
+                        <div class="summary-label">高置信度</div>
+                    </div>
+                    <div class="summary-card">
+                        <div id="medium-confidence" class="summary-value">0</div>
+                        <div class="summary-label">中置信度</div>
+                    </div>
+                </div>
+
+                <h4 style="margin: 24px 0 16px; font-weight: 600;">检测详情</h4>
+                <div id="defect-list" class="defect-list">
+                    <p style="text-align: center; color: var(--gray-400); padding: 40px;">暂无检测结果</p>
+                </div>
+
+                <div style="margin-top: 24px; display: flex; gap: 12px;">
+                    <button id="download-btn" class="btn btn-primary" style="flex: 1;">
+                        <span>💾</span>
+                        <span>下载报告</span>
+                    </button>
+                    <button onclick="closeResultsModal()" class="btn btn-secondary" style="flex: 1;">
+                        <span>✔️</span>
+                        <span>完成</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 缺陷说明弹窗 -->
+    <div id="info-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">缺陷类型说明</h3>
+                <button class="modal-close" onclick="closeInfoModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="defect-types">
+                    <div class="defect-type-card" style="border-color: #ef4444;">
+                        <div class="defect-type-name" style="color: #ef4444;">点蚀 (Pitting)</div>
+                        <div class="defect-type-desc">齿轮表面出现的小点状腐蚀或损伤，通常由接触疲劳引起。严重时会导致齿轮失效。</div>
+                    </div>
+                    <div class="defect-type-card" style="border-color: #f97316;">
+                        <div class="defect-type-name" style="color: #f97316;">剥落 (Spalling)</div>
+                        <div class="defect-type-desc">齿轮表面材料脱落形成的缺陷，会导致噪音和振动增加，影响传动精度。</div>
+                    </div>
+                    <div class="defect-type-card" style="border-color: #f59e0b;">
+                        <div class="defect-type-name" style="color: #f59e0b;">压伤 (Indentation)</div>
+                        <div class="defect-type-desc">由外力挤压导致的齿轮表面凹陷，会影响齿轮的啮合精度和使用寿命。</div>
+                    </div>
+                    <div class="defect-type-card" style="border-color: #8b5cf6;">
+                        <div class="defect-type-name" style="color: #8b5cf6;">擦伤 (Scratching)</div>
+                        <div class="defect-type-desc">齿轮表面的线状磨损痕迹，通常由润滑不良或异物进入引起。</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px; padding: 20px; background: var(--light-blue); border-radius: 12px;">
+                    <h4 style="margin-bottom: 12px; color: var(--dark-blue);">🤖 AI检测优势</h4>
+                    <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8; color: var(--gray-600);">
+                        <li>高精度检测：mAP50达到97.6%</li>
+                        <li>快速处理：单张图像检测时间小于1秒</li>
+                        <li>智能识别：基于深度学习的YOLO模型</li>
+                        <li>实时反馈：即时生成详细检测报告</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let selectedImage = null;
+        let detectionResults = null;
+        let isDetecting = false;
+        let confidence = 0.25;
+
+        // 缺陷类别定义
+        const defectClasses = {
+            0: { name: "点蚀", english: "Pitting", color: "#ef4444" },
+            1: { name: "剥落", english: "Spalling", color: "#f97316" },
+            2: { name: "压伤", english: "Indentation", color: "#f59e0b" },
+            3: { name: "擦伤", english: "Scratching", color: "#8b5cf6" }
+        };
+
+        // DOM元素
+        const elements = {
+            fileInput: document.getElementById('file-input'),
+            uploadZone: document.getElementById('upload-zone'),
+            fileInfo: document.getElementById('file-info'),
+            fileName: document.getElementById('file-name'),
+            fileSize: document.getElementById('file-size'),
+            confidenceSlider: document.getElementById('confidence-slider'),
+            confidenceValue: document.getElementById('confidence-value'),
+            detectBtn: document.getElementById('detect-btn'),
+            resultsBtn: document.getElementById('results-btn'),
+            downloadBtn: document.getElementById('download-btn'),
+            resetBtn: document.getElementById('reset-btn'),
+            infoBtn: document.getElementById('info-btn'),
+            imageDisplay: document.getElementById('image-display'),
+            resultCanvas: document.getElementById('result-canvas'),
+            apiStatus: document.getElementById('api-status'),
+            resultsModal: document.getElementById('results-modal'),
+            infoModal: document.getElementById('info-modal')
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeEventListeners();
+            checkApiStatus();
+            setInterval(checkApiStatus, 30000);
+        });
+
+        // 初始化事件监听
+        function initializeEventListeners() {
+            elements.uploadZone.addEventListener('click', () => elements.fileInput.click());
+            elements.fileInput.addEventListener('change', handleFileSelect);
+
+            elements.uploadZone.addEventListener('dragover', handleDragOver);
+            elements.uploadZone.addEventListener('dragleave', handleDragLeave);
+            elements.uploadZone.addEventListener('drop', handleDrop);
+
+            elements.confidenceSlider.addEventListener('input', handleConfidenceChange);
+
+            elements.detectBtn.addEventListener('click', runDetection);
+            elements.resultsBtn.addEventListener('click', showResultsModal);
+            elements.downloadBtn.addEventListener('click', downloadResults);
+            elements.resetBtn.addEventListener('click', resetDetection);
+            elements.infoBtn.addEventListener('click', showInfoModal);
+
+            // 点击模态框外部关闭
+            elements.resultsModal.addEventListener('click', function(e) {
+                if (e.target === elements.resultsModal) closeResultsModal();
+            });
+            elements.infoModal.addEventListener('click', function(e) {
+                if (e.target === elements.infoModal) closeInfoModal();
+            });
+        }
+
+        // API状态检查
+        async function checkApiStatus() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/health');
+                if (response.ok) {
+                    updateApiStatus('connected', '系统就绪');
+                } else {
+                    updateApiStatus('disconnected', '系统离线');
+                }
+            } catch (error) {
+                updateApiStatus('disconnected', '系统离线');
+            }
+        }
+
+        function updateApiStatus(status, message) {
+            const statusElement = elements.apiStatus;
+            statusElement.innerHTML = `
+                <div class="status-dot" style="background: ${status === 'connected' ? '#3B82F6' : '#DC2626'};"></div>
+                <span>${message}</span>
+            `;
+            statusElement.style.background = status === 'connected' ? 'var(--light-blue)' : '#FEE2E2';
+            statusElement.style.color = status === 'connected' ? 'var(--primary-blue)' : '#DC2626';
+            updateUI();
+        }
+
+        // 文件处理
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) handleFile(file);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            elements.uploadZone.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            elements.uploadZone.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            elements.uploadZone.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) handleFile(files[0]);
+        }
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showNotification('请选择图像文件！', 'error');
+                return;
+            }
+
+            if (file.size > 16 * 1024 * 1024) {
+                showNotification('文件大小不能超过16MB！', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                selectedImage = {
+                    file: file,
+                    url: e.target.result,
+                    name: file.name,
+                    size: file.size
+                };
+
+                updateImageDisplay();
+                updateUI();
+                showNotification('图像上传成功！', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateImageDisplay() {
+            if (selectedImage) {
+                elements.fileName.textContent = selectedImage.name;
+                elements.fileSize.textContent = (selectedImage.size / 1024 / 1024).toFixed(2) + ' MB';
+                elements.fileInfo.classList.remove('hidden');
+
+                elements.imageDisplay.innerHTML = `
+                    <img src="${selectedImage.url}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 12px;">
+                `;
+            }
+        }
+
+        // 置信度调整
+        function handleConfidenceChange(event) {
+            confidence = parseFloat(event.target.value);
+            elements.confidenceValue.textContent = confidence.toFixed(2);
+        }
+
+        // UI更新
+        function updateUI() {
+            const canDetect = selectedImage && !isDetecting &&
+                             elements.apiStatus.textContent.includes('就绪');
+            elements.detectBtn.disabled = !canDetect;
+        }
+
+        // 执行检测
+        async function runDetection() {
+            if (!selectedImage) return;
+
+            isDetecting = true;
+            updateDetectingUI(true);
+
+            try {
+                const result = await callDetectionAPI(selectedImage.file, confidence);
+                detectionResults = result.detections || [];
+
+                await drawDetectionResults(detectionResults);
+                updateDetectionStats(detectionResults);
+
+                elements.resultsBtn.classList.remove('hidden');
+
+                if (detectionResults.length === 0) {
+                    showNotification('未检测到缺陷，齿轮状态良好！', 'success');
+                } else {
+                    showNotification(`检测完成！发现 ${detectionResults.length} 个缺陷`, 'success');
+                    showResultsModal();
+                }
+
+            } catch (error) {
+                console.error('检测失败:', error);
+                showNotification(`检测失败: ${error.message}`, 'error');
+            } finally {
+                isDetecting = false;
+                updateDetectingUI(false);
+                updateUI();
+            }
+        }
+
+        async function callDetectionAPI(imageFile, confidenceThreshold) {
+            const formData = new FormData();
+            formData.append('image', imageFile);
+            formData.append('confidence', confidenceThreshold);
+
+            const response = await fetch('http://127.0.0.1:5000/detect', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `API调用失败: ${response.status}`);
+            }
+
+            return await response.json();
+        }
+
+        function updateDetectingUI(detecting) {
+            if (detecting) {
+                elements.detectBtn.innerHTML = '<span>⏳</span><span>检测中...</span>';
+                elements.detectBtn.disabled = true;
+
+                const loadingOverlay = document.createElement('div');
+                loadingOverlay.className = 'loading-overlay';
+                loadingOverlay.innerHTML = `
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">AI正在分析图像...</div>
+                `;
+                document.querySelector('.image-area').appendChild(loadingOverlay);
+            } else {
+                elements.detectBtn.innerHTML = '<span>🔍</span><span>开始检测</span>';
+                const overlay = document.querySelector('.loading-overlay');
+                if (overlay) overlay.remove();
+            }
+        }
+
+        // 绘制检测结果
+        function drawDetectionResults(results) {
+            return new Promise((resolve) => {
+                const canvas = elements.resultCanvas;
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+
+                img.onload = () => {
+                    const maxWidth = 800;
+                    const maxHeight = 600;
+                    let { width, height } = img;
+
+                    const ratio = Math.min(maxWidth / width, maxHeight / height);
+                    width *= ratio;
+                    height *= ratio;
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    results.forEach((detection, index) => {
+                        const { bbox, class: classId, confidence } = detection;
+                        const defectInfo = defectClasses[classId];
+
+                        const scaleX = width / img.naturalWidth;
+                        const scaleY = height / img.naturalHeight;
+
+                        const x = bbox.x * scaleX;
+                        const y = bbox.y * scaleY;
+                        const w = bbox.width * scaleX;
+                        const h = bbox.height * scaleY;
+
+                        // 绘制边界框
+                        ctx.strokeStyle = defectInfo.color;
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x, y, w, h);
+
+                        // 绘制标签
+                        const label = `${defectInfo.name} ${(confidence * 100).toFixed(1)}%`;
+                        ctx.font = '14px sans-serif';
+                        const textMetrics = ctx.measureText(label);
+                        const textWidth = textMetrics.width + 12;
+                        const textHeight = 20;
+
+                        ctx.fillStyle = defectInfo.color;
+                        ctx.fillRect(x, y - textHeight, textWidth, textHeight);
+                        ctx.fillStyle = 'white';
+                        ctx.fillText(label, x + 6, y - 5);
+
+                        // 绘制序号
+                        ctx.fillStyle = defectInfo.color;
+                        ctx.beginPath();
+                        ctx.arc(x + w - 12, y + 12, 10, 0, 2 * Math.PI);
+                        ctx.fill();
+                        ctx.fillStyle = 'white';
+                        ctx.font = 'bold 12px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText((index + 1).toString(), x + w - 12, y + 16);
+                        ctx.textAlign = 'left';
+                    });
+
+                    elements.imageDisplay.classList.add('hidden');
+                    canvas.classList.remove('hidden');
+                    resolve();
+                };
+
+                img.src = selectedImage.url;
+            });
+        }
+
+        // 更新检测统计
+        function updateDetectionStats(results) {
+            const totalDefects = results.length;
+            const highConfidence = results.filter(d => d.confidence > 0.8).length;
+            const mediumConfidence = results.filter(d => d.confidence > 0.5 && d.confidence <= 0.8).length;
+            const avgConfidence = totalDefects > 0 ?
+                (results.reduce((sum, d) => sum + d.confidence, 0) / totalDefects) : 0;
+
+            document.getElementById('total-defects').textContent = totalDefects;
+            document.getElementById('high-confidence').textContent = highConfidence;
+            document.getElementById('medium-confidence').textContent = mediumConfidence;
+            document.getElementById('avg-confidence').textContent = (avgConfidence * 100).toFixed(1) + '%';
+
+            // 更新缺陷列表
+            const defectList = document.getElementById('defect-list');
+            if (results.length === 0) {
+                defectList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--gray-400);">
+                        <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+                        <div style="font-size: 18px; font-weight: 600; color: var(--gray-600);">检测完成</div>
+                        <div style="font-size: 14px;">未发现明显缺陷，齿轮状态良好！</div>
+                    </div>
+                `;
+            } else {
+                defectList.innerHTML = results.map((detection, index) => {
+                    const defect = defectClasses[detection.class];
+                    const confidenceLevel = detection.confidence > 0.8 ? 'high' :
+                                          detection.confidence > 0.5 ? 'medium' : 'low';
+                    const levelText = confidenceLevel === 'high' ? '高' :
+                                    confidenceLevel === 'medium' ? '中' : '低';
+                    const levelColor = confidenceLevel === 'high' ? '#10B981' :
+                                     confidenceLevel === 'medium' ? '#F59E0B' : '#EF4444';
+
+                    return `
+                        <div class="defect-item" style="border-color: ${defect.color};">
+                            <div class="defect-number" style="background: ${defect.color};">
+                                ${index + 1}
+                            </div>
+                            <div class="defect-info">
+                                <div class="defect-name">${defect.name}</div>
+                                <div class="defect-details">
+                                    ${defect.english} | 位置: (${Math.round(detection.bbox.x)}, ${Math.round(detection.bbox.y)})
+                                </div>
+                            </div>
+                            <div class="defect-confidence">
+                                <div class="confidence-value" style="color: ${defect.color};">
+                                    ${(detection.confidence * 100).toFixed(1)}%
+                                </div>
+                                <div class="confidence-badge" style="background: ${levelColor}20; color: ${levelColor};">
+                                    ${levelText}置信度
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // 下载结果
+        function downloadResults() {
+            const canvas = elements.resultCanvas;
+            if (canvas && !canvas.classList.contains('hidden')) {
+                const link = document.createElement('a');
+                link.download = `gear_detection_${Date.now()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showNotification('检测报告已下载！', 'success');
+            }
+        }
+
+        // 重置检测
+        function resetDetection() {
+            selectedImage = null;
+            detectionResults = null;
+
+            elements.fileInfo.classList.add('hidden');
+            elements.imageDisplay.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🖼️</div>
+                    <div class="empty-title">请上传齿轮图像</div>
+                    <div class="empty-subtitle">支持拖拽上传，系统将自动检测缺陷</div>
+                </div>
+            `;
+            elements.imageDisplay.classList.remove('hidden');
+            elements.resultCanvas.classList.add('hidden');
+            elements.resultsBtn.classList.add('hidden');
+
+            elements.fileInput.value = '';
+            updateUI();
+            showNotification('已重置，可以上传新图像', 'success');
+        }
+
+        // 模态框控制
+        function showResultsModal() {
+            elements.resultsModal.classList.add('show');
+        }
+
+        function closeResultsModal() {
+            elements.resultsModal.classList.remove('show');
+        }
+
+        function showInfoModal() {
+            elements.infoModal.classList.add('show');
+        }
+
+        function closeInfoModal() {
+            elements.infoModal.classList.remove('show');
+        }
+
+        // 通知系统
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="notification-icon">${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</div>
+                <div class="notification-message">${message}</div>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => notification.classList.add('show'), 100);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
